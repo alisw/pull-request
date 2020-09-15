@@ -61,6 +61,7 @@ COMMAND="hub pull-request \
   -b $DESTINATION_BRANCH \
   -h $SOURCE_BRANCH \
   --no-edit \
+  --no-maintainer-edits \
   $PR_ARG \
   || true"
 
