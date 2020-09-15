@@ -21,24 +21,6 @@ DESTINATION_BRANCH="${INPUT_DESTINATION_BRANCH:-"master"}"
 # Github actions no longer auto set the username and GITHUB_TOKEN
 git remote set-url origin "https://$GITHUB_ACTOR:$GITHUB_TOKEN@github.com/$GITHUB_REPOSITORY"
 
-# Pull all branches references down locally so subsequent commands can see them
-git fetch origin '+refs/heads/*:refs/heads/*' --update-head-ok
-
-# Print out all branches
-git --no-pager branch -a -vv
-
-if [ "$(git rev-parse --revs-only "$SOURCE_BRANCH")" = "$(git rev-parse --revs-only "$DESTINATION_BRANCH")" ]; then 
-  echo "Source and destination branches are the same." 
-  exit 0
-fi
-
-# Do not proceed if there are no file differences, this avoids PRs with just a merge commit and no content
-LINES_CHANGED=$(git diff --name-only "$DESTINATION_BRANCH" "$SOURCE_BRANCH" | wc -l | awk '{print $1}')
-if [[ "$LINES_CHANGED" = "0" ]] && [[ ! "$INPUT_PR_ALLOW_EMPTY" ==  "true" ]]; then
-  echo "No file changes detected between source and destination branches." 
-  exit 0
-fi
-
 
 # Workaround for `hub` auth error https://github.com/github/hub/issues/2149#issuecomment-513214342
 export GITHUB_USER="$GITHUB_ACTOR"
